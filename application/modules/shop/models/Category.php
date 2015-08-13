@@ -94,6 +94,7 @@ class Category extends ActiveRecord implements \JsonSerializable
             ],
             [
                 'class' => Tree::className(),
+                'activeAttribute' => 'active',
             ],
         ];
     }
@@ -574,6 +575,13 @@ class Category extends ActiveRecord implements \JsonSerializable
         return true;
     }
 
+    public function afterDelete()
+    {
+        FilterSets::deleteAll(['category_id' => $this->id]);
+        parent::afterDelete();
+    }
+
+
     /**
      * Get children menu items with selected depth
      * @param int $parentId
@@ -707,4 +715,3 @@ class Category extends ActiveRecord implements \JsonSerializable
         return ($this->className() . ':' . $this->id);
     }
 }
-?>

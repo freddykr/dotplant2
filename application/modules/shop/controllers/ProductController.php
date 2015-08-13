@@ -65,7 +65,7 @@ class ProductController extends Controller
             $values_by_property_id = [$values_by_property_id];
         }
 
-        if (Yii::$app->request->isAjax && Yii::$app->request->isPost && isset($_POST['properties'])) {
+        if (Yii::$app->request->isPost && isset($_POST['properties'])) {
             if (is_array($_POST['properties'])) {
                 foreach ($_POST['properties'] as $key => $value) {
                     if (isset($values_by_property_id[$key])) {
@@ -104,9 +104,14 @@ class ProductController extends Controller
         $allSorts = $result['allSorts'];
         $products = $result['products'];
 
+        // throw 404 if we are at filtered page without any products
+        if ( !empty($values_by_property_id) && empty($products)) {
+            throw new NotFoundHttpException();
+        }
+
         if (null !== $selected_category = $selected_category_id) {
             if ($selected_category_id > 0) {
-                if (null !== $selected_category = Category::findById($selected_category_id, null, null)) {
+                if (null !== $selected_category = Category::findById($selected_category_id, null)) {
                     if (!empty($selected_category->meta_description)) {
                         $this->view->registerMetaTag(
                             [
